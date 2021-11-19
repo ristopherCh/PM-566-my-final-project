@@ -33,7 +33,7 @@ You are in for a good time my friend.
 source("process_COVID_data.R")
 ```
 
-```{r, echo = FALSE}
+```{r echo = FALSE}
 p1_scatter <- cv_states_today %>% 
   plot_ly(x = ~pop_density, y = ~deathsper100k,
           type = 'scatter', mode = 'markers', color = ~state,
