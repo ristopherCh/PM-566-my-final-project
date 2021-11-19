@@ -1,1 +1,10 @@
-
+name: "Chris' Lab 13 Website"
+output_dir: "."
+navbar:
+  title: "Such a website, so spectacular, never seen before"
+  left:
+    - text: "Get ready when you click this because, let me tell you, wow"
+      href: index.html
+output:
+  html_document:
+    theme: yeti
