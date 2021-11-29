@@ -6,72 +6,208 @@ output:
         toc: TRUE
         toc_float: TRUE
 ---
-
-```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
+  echo = FALSE, 
   warning = FALSE,
   message = FALSE,
-  eval=TRUE,
-  echo = FALSE,
-  cache = TRUE,
-  fig.width = 7, 
-  fig.align = 'center',
-  fig.asp = 0.618,
-  out.width = "700px")
+  fig.align = 'center', 
+  fig.width=10
+  )
+```
+
+```{r libraries, include = FALSE}
+library(httr)
+library(xml2)
 library(data.table)
+library(ggplot2)
 library(tidyverse)
-library(dplyr)
+library(lubridate)
+library(rvest)
+library(stringr)
+library(ggsci)
 library(plotly)
-library(DT)
-library(knitr)
+library(zoo)
 ```
 
-This is my PM566 Final Project website.
-You are in for a good time my friend.
+# How has COVID-19 affected the US substance abuse crisis?
 
-```{r load-data, echo=FALSE}
-source("process_COVID_data.R")
+## Introduction
+
+Drug overdose deaths in the United States have been rising steadily since the turn of the century, and a significant increase in this trend has been observed since the mid-2010's. Public discourse around this tragedy led to cultural and political changes which appeared to have slowed the trend around 2018. Then, in March 2020, the COVID-19 pandemic led to an upheaval in nearly every aspect of daily life, resulting in drastic changes to the way we work, socialize, and interact with society at large. 
+
+Such a fundamental change in the way we live our lives led to universally destabilizing experiences. To slow the spread of the virus, most public places of congregation were shut down, leading to widespread loss of jobs and a crash of the economy. Those with job security soon found new ways to work through the pandemic, and those without it found themselves without a job and an income.
+
+The category of person most likely to be debilitated by the COVID-19 pandemic correlates with the type of person most vulnerable to experiencing drug addiction. Substance abuse is associated with unemployment or underemployment, lack of career opportunities, social isolation, mental health issues, and homelessness. As COVID-19 has undeniably contributed to each of these factors, an investigation into the pandemic’s effect on the substance abuse crisis is warranted.
+
+```{r state_names}
+abbrev2 <- read_html(x = "https://simple.wikipedia.org/wiki/List_of_U.S._states_by_traditional_abbreviation")
+abtable2 <- xml_find_all(abbrev2, xpath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody")
+abtable2 <- html_table(abtable2)
+abtable2 <- rbindlist(abtable2)
+abtable2 <- abtable2[, .(State, Otherabbreviations)]
+setnames(abtable2, "State", "state_name")
+setnames(abtable2, "Otherabbreviations", "state_abbreviation")
+abtable2$state_name = toupper(abtable2$state_name)
+abtable2$state_abbreviation = toupper(abtable2$state_abbreviation)
+abtable2$state_abbreviation <- str_replace_all(abtable2$state_abbreviation, "[[:punct:]]", "")
+abtable2[11,1] <- "GEORGIA"
+abtable2 <- abtable2 %>% add_row(state_name = "UNITED STATES", state_abbreviation = "US")
+abtable2 <- abtable2[order(state_name)]
+
+#Getting state abbreviations, first attempt which stalls out occasionally
+#abbrev <- read_html(x = "https://npiregistry.cms.hhs.gov/registry/API-State-Abbr")
+#abtable <- xml_find_all(abbrev, xpath = "/html/body/div[2]/div[2]/div/div/div/div[2]/div[2]/div[1]/table")
+#abtable <- html_table(abtable)
+#abtable <- rbindlist(abtable)
+#setnames(abtable, "State  Name", "state_name")
+#setnames(abtable, "State Abbreviation", "state_abbreviation")
 ```
 
-```{r nytdata, echo=FALSE}
-p1_scatter <- cv_states_today %>% 
-  plot_ly(x = ~pop_density, y = ~deathsper100k,
-          type = 'scatter', mode = 'markers', color = ~state,
-          size = ~population, sizes = c(5, 70), marker = list(sizemode='diameter', opacity=0.5),
-          hoverinfo = 'text',
-          text = ~paste( paste(state, ":", sep=""), paste(" Cases per 100k: ", per100k, sep="") , paste(" Deaths per 100k: ",
-                        deathsper100k, sep=""), sep = "<br>")) %>%
-  layout(title = "Population-normalized COVID-19 deaths vs. population density",
-                  yaxis = list(title = "Deaths per 100k"), xaxis = list(title = "Population Density"),
-         hovermode = "compare")
+```{r API-census-population}
+# https://www.census.gov/data/developers/guidance/api-user-guide.Example_API_Queries.html
+# Retrieving dimensions
 
-# filter out "District of Columbia"
-cv_states_today_scatter <- cv_states_today %>% filter(state!="District of Columbia")
+censusquery <- GET(
+  url = "https://api.census.gov/data/2019/pep/population?get=NAME,POP&for=state:*"
+)
 
-p2_scatter <- cv_states_today_scatter %>% 
-  plot_ly(x = ~pop_density, y = ~deathsper100k,
-          type = 'scatter', mode = 'markers', color = ~state,
-          size = ~population, sizes = c(5, 70), marker = list(sizemode='diameter', opacity=0.5),
-          hoverinfo = 'text',
-          text = ~paste( paste(state, ":", sep=""), paste(" Cases per 100k: ", per100k, sep="") , paste(" Deaths per 100k: ",
-                        deathsper100k, sep=""), sep = "<br>")) %>%
-  layout(title = "Population-normalized COVID-19 deaths vs. population density",
-                  yaxis = list(title = "Deaths per 100k"), xaxis = list(title = "Population Density"),
-         hovermode = "compare")
+# Checking if the website is active
+#censusquery$status_code
+
+# Processing data
+census_content <- content(censusquery)
+census <- rbindlist(census_content)
+census <- census[-1,]
+setnames(census, "V2", "population")
+setnames(census, "V1", "state_name")
+setnames(census, "V3", "state_number")
+census$population <- as.numeric(census$population)
+census$state_number <- as.numeric(census$state_number)
+census <- census %>% add_row(state_name = "United States", population = sum(census$population), state_number = 57)
+census <- census[order(state_name)]
+
+
+#Combining census and abtable data.tables
+census$state_name = toupper(census$state_name)
+census <- merge(census, abtable2)
+#census$population <- as.numeric(census$population)
+#census$population <- as.numeric(census$population)
 ```
 
-## Showcasing plots {.tabset}
+## Preliminary Results
+
+A timeline:
+
+COVID-19 was first detected in the USA on January 17, 2020, in Washington State. By March 13, 2020, President Trump had declared a nationwide emergency, and 2 days later, schools and restaurants began to shut down. By May 9th, 2020, the unemployment rate hit 14.7%, the worst rate since the Great Depression. By September 2020, the US COVID-19 death toll surpassed 200,000, and by January 18, 2021, it had doubled to 400,000. On December 14th, 2020, the initial phase of the vaccination program began, and by March 13, 2021, the US had surpassed 100 million vaccinations administered. By July 1st, 2021, the delta variant had become detected in all 50 US States.
+
+```{r covid_api}
+# Retrieving dimensions
+covidquery <- GET(
+  url = "https://data.cdc.gov/resource/9mfq-cb36.json?$limit=50000"
+)
+
+# Checking if the website is active
+#covidquery$status_code
+
+# Processing data
+covid_content <- content(covidquery)
+
+covid <- rbindlist(covid_content[1:length(covid_content)], fill=TRUE)
+covid$date <- as.Date(covid$submission_date)
+covid$tot_death <- as.numeric(covid$tot_death)
+covid$tot_cases <- as.numeric(covid$tot_cases)
+covid$new_case <- as.numeric(covid$new_case)
+covid$new_death <- as.numeric(covid$new_death)
+
+# Removing extraneous columns from 'covid'
+covid <- covid[, .(state, tot_cases, new_case, tot_death, new_death, date)]
+covid <- covid[order(state, date)]
+```
+
+```{r merge_census_covid}
+#Combining census and covid data.tables
+covid <- merge(covid, census, by.x = "state", by.y = "state_abbreviation")
+covid$population <- as.numeric(covid$population)
+```
+
+```{r covid_population_norming}
+# Creating death_perc, total death / total population
+covid$death_perc <- covid$tot_death * 100 / covid$population
+covid$case_perc <- covid$tot_cases * 100 / covid$population
+covid$newdeath_perc <- covid$new_death * 100 / covid$population
+covid$newcase_perc <- covid$new_case * 100 / covid$population
+
+# Summing up COVID data from all states, for total US values--------------------
+covid_usa <- aggregate(cbind(tot_cases, new_case, tot_death, new_death, death_perc, case_perc, newdeath_perc, newcase_perc, population) ~ date, data = covid, FUN = sum, na.rm = TRUE)
+```
+
+
+```{r covid_usa_plot}
+ggplot(covid_usa, aes(x = date, y = new_case)) +
+  geom_line() +
+  labs(title = "New US COVID-19 cases", subtitle = "Source: data.cdc.gov API") +
+  geom_vline(xintercept=as.numeric(covid_usa$date[52]), linetype="dashed", size = 1) +
+  annotate(geom = "text", x = covid_usa$date[60], y = 150000, label = "Emergency Declaration", angle = 90, color = "blue") +
+  geom_vline(xintercept=as.numeric(covid_usa$date[109]), linetype="dashed", size = 1) +
+  annotate(geom = "text", x = covid_usa$date[117], y = 150000, label = "14.7% unemployment", angle = 90, color = "blue") +
+  geom_vline(xintercept=as.numeric(covid_usa$date[416]), linetype="dashed", size = 1) +
+  annotate(geom = "text", x = covid_usa$date[424], y = 150000, label = "100 million vaccinations", angle = 90, color = "blue")+
+  geom_vline(xintercept=as.numeric(covid_usa$date[329]), linetype="dashed", size = 1) +
+  annotate(geom = "text", x = covid_usa$date[337], y = 60000, label = "Vaccination begins", angle = 90, color = "blue") +
+  geom_vline(xintercept=as.numeric(covid_usa$date[527]), linetype="dashed", size = 1) +
+  annotate(geom = "text", x = covid_usa$date[535], y = 150000, label = "Delta variant spreads", angle = 90, color = "blue") +
+  xlab("Date") + ylab("New COVID-19 cases")
+```
+
+This timeline helps provide a framework for interpreting the following simple plots:
+
+```{r covid_basic_plots}
+p1 <- ggplot(covid_usa, aes(x = date, y = case_perc)) +
+  geom_line(color = "red", size = 1) +
+  labs(title = "Total US COVID-19 cases by % of US population", subtitle = "Source: data.cdc.gov API")  +
+  xlab("Date") + ylab("Total percent of US population infected with COVID-19")
+
+p2 <- ggplot(covid_usa, aes(x = date, y = new_death)) +
+  geom_line() +
+  labs(title = "New US COVID-19 deaths per day", subtitle = "Source: data.cdc.gov API") +
+  xlab("Date") + ylab("Daily COVID-19 deaths")
+
+p3 <- ggplot(covid_usa, aes(x = date, y = tot_death)) +
+ geom_line() +
+ labs(title = "Total US COVID-19 deaths") +
+ xlab("Date") + ylab("COVID-19 deaths")
+
+p4 <- ggplot(covid_usa, aes(x = date, y = death_perc)) +
+  geom_line(color = "blue", size = 1) +
+  labs(title = "Total US COVID-19 deaths by % of US population", subtitle = "Source: data.cdc.gov API") +
+  xlab("Date") + ylab("Total percent of US population killed by COVID-19")
+```
+
+## Some Temporary Plots {.tabset}
 
 ### Tab 1
 
 ```{r echo=FALSE}
-p1_scatter
+p1
 ```
 
 ### Tab 2
 
 ```{r echo=FALSE}
-p2_scatter
+p2
+```
+
+### Tab 3
+
+```{r echo=FALSE}
+p3
+```
+
+### Tab 4
+
+```{r echo=FALSE}
+p4
 ```
 
 {-}
