@@ -1,0 +1,8 @@
+---
+title: "PM566 Final Project Supplementary"
+author: "Chris Hanson"
+output: 
+    html_document:
+        toc: TRUE
+        toc_float: TRUE
+---

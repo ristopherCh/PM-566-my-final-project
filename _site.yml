@@ -3,8 +3,10 @@ output_dir: "."
 navbar:
   title: "My Website"
   left:
-    - text: "Home"
+    - text: "Final Project"
       href: index.html
+    - text: "Supplementary"
+      href: supplementary.html
 output:
   html_document:
     theme: cosmo

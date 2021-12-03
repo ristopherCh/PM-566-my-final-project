@@ -1,6 +1,6 @@
 ---
 title: "PM566 Final Project"
-author: "Your Name"
+author: "Chris Hanson"
 output: 
     html_document:
         toc: TRUE
@@ -510,7 +510,7 @@ While this may seem counterintuitive, COVID-19 affected the US in more ways than
 
 To investigate this possibility, another dataset will be introduced into this analysis: monthly unemployment data in the 50 US states.
 
-### COVID-19 induced unemployment vs deaths by overdose
+## COVID-19 and unemployment in the US
 
 ```{r unemployment_fread}
 # https://www.bls.gov/lau/data.htm
@@ -618,7 +618,7 @@ The above tabs show a sequence of similar scatterplots, with each subsequent plo
 
 **Tab 3** also uses normalized unemployment values, but also considers the percentage increase in drug overdoses per capita for the 12 month period coinciding with COVID-19, compared to the 12 month period immediately prior. By eliminating another confounding factor, an even more accurate picture of the relationship between COVID-19 induced unemployment and drug overdose deaths is shown. A positive correlation is suggested, but is far from certain.
 
-### COVID-19 induced economic slowdown vs deaths by overdose
+## COVID-19 and economic shutdown in the US
 
 Another way to measure the economic health of a community is to consider the change in state GDP in the period following the COVID lockdown.
 
