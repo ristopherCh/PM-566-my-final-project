@@ -140,20 +140,10 @@ ccpp <- ggplot(covid, aes(x = date, y = case_perc, color = state_name)) +
   xlab("Date") + ylab("COVID-19 cases by % of state population") +
   theme(legend.title = element_text(size = 5), legend.text = element_text(size = 5))
 
-#ggplot(covid, aes(x = date, y = newcase_perc, color = state_name)) +
-#  geom_line(show.legend = FALSE) +
-#  labs(title = "New COVID-19 cases by % of state population") +
-#  xlab("Date") + ylab("Daily COVID-19 cases")
-
 cdpp <- ggplot(covid, aes(x = date, y = death_perc, color = state_name)) +
   geom_line() +
   labs(title = "COVID-19 deaths by % of state population", subtitle = "Source: data.cdc.gov API")+
   xlab("Date") + ylab("COVID-19 deaths by % of state population")
-
-#ggplot(covid, aes(x = date, y = newdeath_perc, color = state_name)) +
-#  geom_line(show.legend = FALSE) +
-#  labs(title = "New COVID-19 deaths by % of state population")+
-#  xlab("Date") + ylab("Daily COVID-19 deaths")
 ```
 
 ```{r covid_max}
@@ -207,13 +197,17 @@ drugs <- drugs[order(state_number, date)]
 
 Drug overdose deaths in the United States have been rising steadily since the turn of the century, and a significant increase in this trend has been observed since the mid-2010's. In March 2020, the COVID-19 pandemic led to an upheaval in nearly every aspect of daily life, resulting in drastic changes to the way we work, socialize, and interact with society at large. To slow the spread of the virus, most public places of congregation were shut down, leading to widespread loss of jobs and a crash of the economy.
 
-Substance abuse is associated with unemployment or underemployment, lack of career opportunities, social isolation, mental health issues, and homelessness. As COVID-19 has undeniably contributed to each of these factors, an investigation into the pandemic’s effect on the substance abuse crisis is warranted.
+Substance abuse is associated with unemployment or underemployment, lack of career opportunities, social isolation, mental health issues, and homelessness. As COVID-19 has contributed to each of these factors, an investigation into the pandemic’s effect on the substance abuse crisis is warranted.
+
+## COVID-19 in the US
 
 The COVID-19 pandemic was experienced differently in each state:
 
 ```{r}
 ggplotly(cdpp)
 ```
+
+The state with the highest number deaths per population, `r covid_max[1,state_name]`, has experienced per population mortality rates `r format(round(covid_max[1,death_perc] * 100 / covid_max[nrow(covid_max),death_perc]), 2)`% higher than that of the lowest number of deaths per population, `r covid_max[nrow(covid_max),state_name]`.
 
 ## The drug mortality crisis in the US
 
@@ -242,7 +236,7 @@ gdu
 
 There does appear to be a clear acceleration in the rate of drug overdose deaths following the onset of the COVID-19 pandemic. 
 
-This graph makes clear that the drug most heavily responsible for all drug overdose deaths, as well as the most recent spike in deaths, is opioids - namely, synthetic opioids. According to numerous government agencies, the synthetic opioid behind this rise in fatalities is fentanyl, which is often used to lace other drugs. As little as two milligrams of fentanyl can be lethal.
+This plot makes clear that the drug most heavily responsible for all drug overdose deaths, as well as the most recent spike in deaths, is opioids - namely, synthetic opioids. According to numerous government agencies, the synthetic opioid behind this rise in fatalities is fentanyl, which is often used to lace other drugs. As little as two milligrams of fentanyl can be lethal.
 
 ```{r drugs_usa_2_3}
 indicators = unique(drugs$indicator)
@@ -270,7 +264,7 @@ minod <- drugs_usa[date == "2015-01-01" & indicator == "Number of Drug Overdose 
 minsynth <- drugs_usa[date == "2015-01-01" & indicator == "Synthetic opioids, excl. methadone"]
 ```
 
-In January 2015 synthetic opioids accounted for `r format(round(minsynth$deaths * 100 / minod$deaths, 0))`% of all overdose deaths. As of March 01, 2021 synthetic opioids were responsible for `r format(round(maxsynth$deaths * 100 / maxod$deaths, 0))`% of all drug overdose deaths in the US. During this time, the total number of deaths due to synthetic opioids grew by `r format(round(maxsynth$deaths * 100/ minsynth$deaths, 0))`%.
+In January 2015 synthetic opioids accounted for `r format(round(minsynth$deaths * 100 / minod$deaths, 0))`% of all overdose deaths. As of March 01, 2021 synthetic opioids were responsible for `r format(round(maxsynth$deaths * 100 / maxod$deaths, 0))`% of all drug overdose deaths in the US. During this time, the total number of annual deaths due to synthetic opioids grew by `r format(round(maxsynth$deaths * 100/ minsynth$deaths, 0))`%.
 
 Each state is experiencing the drug epidemic in its own way:
 
@@ -302,12 +296,8 @@ od_max$odincrease_apr20apr21 <- (od_max$deaths - od_0420$deaths) * 100 / od_0420
 ```
 
 ```{r covid-vs-drugs plots}
-# Plots of covid vs relative drug deaths
-
-# Used below
-covid_0421 <- covid[date == "2021-04-01"] # Changed for fun
-
 # Covid data from 03.21 with OD % increase data from 04.20-04.21
+covid_0421 <- covid[date == "2021-04-01"]
 covid_od <- merge.data.frame(covid_0421, od_max)
 
 od_cov1 <- ggplot(covid_od, aes(x = death_perc, y = odincrease_apr20apr21, label = state_name)) +
@@ -321,13 +311,13 @@ od_cov2 <- ggplot(covid_od, aes(x = case_perc, y = odpop_perc, label = state_nam
   labs(title = "Cases of COVID vs deaths by overdose in US states", x = "% of state pop infected by COVID-19", y = "% of total state population killed by OD, April 2020 - April 2021", subtitle = "Source: data.cdc.gov API")
 ```
 
-The graph below probes the question of whether statewide COVID-19 *deaths* per capita is correlated with the *percentage increase (over subsequent 12 month periods) in deaths due to overdose* per capita.
+The plot below probes the question of whether statewide COVID-19 *deaths* per capita is correlated with the *percentage increase (over subsequent 12 month periods) in deaths due to overdose* per capita.
 
 ```{r plot_covidvsod}
 ggplotly(od_cov1)
 ```
 
-The above plot indicates that there is either no relation between the two factors, or there is even a negative correlation. 
+This indicates that there is either no relation between the two factors, or there is even a negative correlation. 
 
 In an attempt to make sense of this apparent negative correlation, the question is asked whether states which experienced the lowest COVID-19 mortalities endured the most severe lockdowns - resulting in lower virus associated deaths but higher social isolation and a more damaged economy, and thus possibly more deaths due to overdose.
 
@@ -348,7 +338,6 @@ UD <- unemployment$date
 UDF <- as.Date(paste0("01-", UD), format = "%d-%b-%y")
 unemployment$date <- UDF
 unemployment <- unemployment[order(STATE, date)]
-
 ```
 
 ```{r unemployment_investigation}
@@ -378,20 +367,19 @@ u5 <- ggplot(covid_od_unemp, aes(x = umax_value, y = odpop_perc, label = state_n
 u4 <- ggplot(covid_od_unemp, aes(x = unemp_change, y = odpop_perc, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Increase in unemployment vs deaths by OD", x = "Relative increase in unemployment, April 2020 - October 2020", y = "OD deaths by % of state population, April 2020 - April 2021")
+  labs(title = "Increase in unemployment vs deaths by OD", x = "Relative increase in unemployment, April 2020 - October 2020", y = "OD deaths by % of state population, February 2020 - April 2021")
 
 u3 <- ggplot(covid_od_unemp, aes(x = unemp_change, y = odincrease_apr20apr21, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Unemployment growth vs 12 month OD increase", x = "Relative increase in unemployment, April 2020 - October 2020", y = "% increase in deaths by OD from 04/2019 - 04/2020 vs 04/2020 - 04/2021")
-
+  labs(title = "Unemployment growth vs 12 month OD increase", x = "Relative increase in unemployment, February 2020 - October 2020", y = "% increase in deaths by OD from 04/19-04/20 to 04/20-04/21")
 ```
 
 ```{r plot_umpod3}
 ggplotly(u3, tooltip = c("label"))
 ```
 
-This graph shows normalized unemployment values vs the percentage increase in drug overdoses per capita for the 12 month period coinciding with COVID-19, compared to the 12 month period immediately prior. A positive correlation is suggested, but is far from certain.
+This plot shows normalized unemployment values vs the percentage increase in drug overdoses per capita for the 12 month period coinciding with COVID-19, compared to the 12 month period immediately prior. A positive correlation is suggested, but is not definitive.
 
 ## COVID-19 and economic shutdown in the US
 
@@ -403,11 +391,10 @@ Below is a visualization of the relationship between the normalized percentage d
 # Retrieving dimensions
 # https://apps.bea.gov/api/_pdf/bea_web_service_api_user_guide.pdf, pg 11
 
-if(!exists("econquery"))
-{
+if(!exists("econquery")){
 econquery <- GET(url = "https://apps.bea.gov/api/data/?&UserID=0BACEFA6-DE0F-459B-B599-D4B53A5B7528&method=GetData&datasetname=Regional&TableName=SQGDP9&LineCode=1&GeoFips=STATE&Frequency=Q&Year=2018,2019,2020,2021&ResultFormat=JSON"
-                 ) #Real GDP by state
-}
+                 )} #Real GDP by state
+
 # Checking if the website is active
 #econquery$status_code
 
@@ -423,7 +410,6 @@ econ$GeoName <- toupper(econ$GeoName)
 
 econ <- econ %>% filter(GeoName %in% abtable2$state_name)
 econ <- econ %>% filter(GeoName != "UNITED STATES")
-
 ```
 
 ```{r econ_cleanup}
@@ -436,7 +422,6 @@ econ_relative <- merge(econ, econ_min, by = "GeoName")
 econ_relative$relative <- econ_relative$DataValue / econ_relative$`relative_value`
 #econ_relative <- filter(econ_relative, TimePeriod.x >= "2019-07-01")
 econ_relative <- econ_relative[order(GeoName, TimePeriod.x)]
-
 ```
 
 ```{r econ_plot}
@@ -463,13 +448,13 @@ covid_od_econ <- covid_od_econ %>% filter(!state_name %in% c("HAWAII", "ALASKA")
 w1 <- ggplot(covid_od_econ, aes(x = econdrop, y = odincrease_apr20apr21, label = state_name, color = case_perc)) +
   geom_point() +
   geom_smooth() +
-  labs(title = "Economic recession vs 12 month OD increase", x = "% drop in GDP, 4th qtr 2019 - 2nd qtr 2020", y = "% increase in deaths by OD, 04/19-04/20 vs 04/20-04/21", color = "Cases of\nCOVID-19 by\n% state population")
+  labs(title = "Economic recession vs 12 month OD increase", x = "% drop in state GDP, QTR4 2019 - QTR2 2020", y = "% increase in deaths by OD, 04/19-04/20 vs 04/20-04/21", color = "Cases of\nCOVID-19 by\n% state population")
 
 ggplotly(w1, tooltip = c("label"))
 ```
 
 ## Conclusion and Summary
-Fiddlesticks.
+
 
 ## Methods
 Data regarding the population of the US and its States was collected from the census.gov’s API portal. It was converted to a data.table by the methods instructed in lecture, and associated with other data.tables using the data.table merge method.
