@@ -1,10 +1,11 @@
-name: "The PM566 Final Project Website of Chris Hanson"
-output_dir: "."
+name: "my-website"
 navbar:
-  title: "PM566 Final Project Website"
+  title: "My Website"
   left:
-    - text: "Main Page"
+    - text: "Home"
       href: index.html
+    - text: "Supplementary"
+      href: supplementary.html
 output:
   html_document:
-    theme: yeti
+    theme: cosmo

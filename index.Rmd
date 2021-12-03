@@ -4,7 +4,6 @@ author: "Chris Hanson"
 date: "12/03/2021"
 output:
   html_document: default
-always_allow_html: TRUE
 ---
 
 ```{r setup, include=FALSE}
