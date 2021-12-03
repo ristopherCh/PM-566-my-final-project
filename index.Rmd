@@ -58,13 +58,14 @@ abtable2 <- abtable2 %>% add_row(state_name = "UNITED STATES", state_abbreviatio
 abtable2 <- abtable2[order(state_name)]
 ```
 
-```{r API-census-population}
+```{r census_api}
 # https://www.census.gov/data/developers/guidance/api-user-guide.Example_API_Queries.html
 # Retrieving dimensions
-
+if (!exists("censusquery")){
 censusquery <- GET(
   url = "https://api.census.gov/data/2019/pep/population?get=NAME,POP&for=state:*"
 )
+}
 
 # Checking if the website is active
 #censusquery$status_code
@@ -107,9 +108,11 @@ COVID-19 was first detected in the USA on January 17, 2020, in Washington State.
 
 ```{r covid_api}
 # Retrieving dimensions
+if(!exists("covidquery")){
 covidquery <- GET(
   url = "https://data.cdc.gov/resource/9mfq-cb36.json?$limit=50000"
 )
+}
 
 # Checking if the website is active
 #covidquery$status_code
@@ -247,8 +250,9 @@ Having the above information in hand will help provide perspective as a prelimin
 # Retrieving dimensions
 # https://data.cdc.gov/NCHS/VSRR-Provisional-Drug-Overdose-Death-Counts/xkb8-kh2a
 
+if(!exists("drugsquery")){
 drugsquery <- GET(url = "https://data.cdc.gov/resource/xkb8-kh2a.json?$limit=50000")
-
+}
 # Checking if the website is active
 #drugsquery$status_code
 
@@ -621,9 +625,12 @@ Another way to measure the economic health of a community is to consider the cha
 ```{r econ_api}
 # Retrieving dimensions
 # https://apps.bea.gov/api/_pdf/bea_web_service_api_user_guide.pdf, pg 11
+
+if(!exists("econquery"))
+{
 econquery <- GET(url = "https://apps.bea.gov/api/data/?&UserID=0BACEFA6-DE0F-459B-B599-D4B53A5B7528&method=GetData&datasetname=Regional&TableName=SQGDP9&LineCode=1&GeoFips=STATE&Frequency=Q&Year=2018,2019,2020,2021&ResultFormat=JSON"
                  ) #Real GDP by state
-
+}
 # Checking if the website is active
 #econquery$status_code
 
