@@ -1,12 +1,12 @@
-name: "my-website"
+name: "PM566_Final_Project"
 output_dir: "."
 navbar:
-  title: "My Website"
+  title: "PM 566 Final Project"
   left:
-    - text: "Final Project"
+    - text: "Home Page"
       href: index.html
-    - text: "Supplementary"
+    - text: "Supplementary Figures"
       href: supplementary.html
 output:
   html_document:
-    theme: cosmo
+    theme: yeti
