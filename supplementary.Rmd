@@ -1,10 +1,7 @@
 ---
-title: "PM566 Final Project Supplementary"
-author: "Chris Hanson"
+title: "Supplementary Figures"
 output: 
-    html_document:
-        toc: TRUE
-        toc_float: TRUE
+    html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +13,8 @@ knitr::opts_chunk$set(
   fig.width = 10
   )
 ```
+
+COVID-19 was first detected in the USA on January 17, 2020, in Washington State. By March 13, 2020, President Trump had declared a nationwide emergency, and 2 days later, schools and restaurants began to shut down. By May 9th, 2020, the unemployment rate hit 14.7%, the worst rate since the Great Depression. By September 2020, the US COVID-19 death toll surpassed 200,000, and by January 18, 2021, it had doubled to 400,000. On December 14th, 2020, the initial phase of the vaccination program began, and by March 13, 2021, the US had surpassed 100 million vaccinations administered. By July 1st, 2021, the delta variant had become detected in all 50 US States.
 
 ```{r covid_usa_plot}
 gct <- ggplot(covid_usa, aes(x = date, y = new_case)) +
@@ -36,21 +35,19 @@ gct <- ggplot(covid_usa, aes(x = date, y = new_case)) +
 gct
 ```
 
-#### COVID-19 cases per state
+Comparing the plot below to that of COVID-19 deaths on the home page, we see that there is not a perfect relationship between COVID-19 cases and associated deaths.
 
 ```{r}
 ggplotly(ccpp)
 ```
 
-#### COVID-19 deaths per state
-
-```{r}
-ggplotly(cdpp)
-```
+This plot compares COVID-19 cases per state with raw, non-normalized deaths due to overdose. Outliers such as West Virginia fall into place when normalizing OD values to their pre-COVID levels.
 
 ```{r plot_covidvsod2}
 ggplotly(od_cov2)
 ```
+
+The maps below highlight a few areas (the southeastern US) where COVID-19 and deaths due to overdose seem to correlate, as well as contrasting areas (the northern midwest, the New England area) where they seem inversely related.
 
 ```{r maps}
 g <- list(
@@ -82,11 +79,18 @@ plot_geo() %>%
   colorbar(title = "% increase in\nOD associated \ndeaths,\n2019 to 2020")
 ```
 
+The unemployment resulting from the business shutdowns during COVID-19 was experienced very differently between the states:
+
 ```{r}
 ggplotly(unem)
 ```
 
-### Unemployment vs deaths by OD {.tabset}
+
+**Tab 1** below shows raw unemployment numbers compared to raw deaths due to overdose per state, without considering prior unemployment values. Even without the influence of COVID-19, a relationship between these variables is to be expected, and indeed a positive relationship appears to exist.
+
+**Tab 2** shows the same data, but with unemployment normalized against pre COVID-19 levels. The relationship still appears positively correlated, but with greater variance.
+
+### Unemployment {.tabset}
 
 #### Tab 1
 
@@ -102,11 +106,14 @@ ggplotly(u3, tooltip = c("label"))
 
 ### {-}
 
-**Tab 1** shows raw unemployment numbers compared to raw deaths due to overdose per state, without considering prior unemployment values. Even without the influence of COVID-19, a relationship between these variables is to be expected, and indeed a positive relationship appears to exist.
 
-**Tab 2** shows the same data, but with unemployment normalized against pre COVID-19 levels. The relationship still appears positively correlated, but with greater variance.
+Similar to unemployment numbers, the drop in GDP experienced during COVID-19 due to enforced lockdowns and social distancing differed between states, with some recovering much faster than others.
 
-### Economic slowdown due to COVID-19 {.tabset}
+**Tab 1** below shows raw quarterly state GDP.
+
+**Tab 2** shows state GDP relative to 4th quarter 2019, before the pandemic began.
+
+### GDP {.tabset}
 
 #### Tab 1
 
@@ -119,4 +126,7 @@ ggplotly(ggecon)
 ```{r plot_econ2}
 ggplotly(ggecon_rel)
 ```
+
 ### {-}
+
+

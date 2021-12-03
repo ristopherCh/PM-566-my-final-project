@@ -199,6 +199,8 @@ Drug overdose deaths in the United States have been rising steadily since the tu
 
 Substance abuse is associated with unemployment or underemployment, lack of career opportunities, social isolation, mental health issues, and homelessness. As COVID-19 has contributed to each of these factors, an investigation into the pandemic’s effect on the substance abuse crisis is warranted.
 
+<br>
+
 ## COVID-19 in the US
 
 The COVID-19 pandemic was experienced differently in each state:
@@ -208,6 +210,8 @@ ggplotly(cdpp)
 ```
 
 The state with the highest number deaths per population, `r covid_max[1,state_name]`, has experienced per population mortality rates `r format(round(covid_max[1,death_perc] * 100 / covid_max[nrow(covid_max),death_perc]), 2)`% higher than that of the lowest number of deaths per population, `r covid_max[nrow(covid_max),state_name]`.
+
+<br>
 
 ## The drug mortality crisis in the US
 
@@ -323,6 +327,8 @@ In an attempt to make sense of this apparent negative correlation, the question 
 
 To investigate this possibility, another dataset will be introduced into this analysis: monthly unemployment data in the 50 US states.
 
+<br>
+
 ## COVID-19 and unemployment in the US
 
 To examine the possibility that the unemployment experienced as a result of the COVID-19 lockdowns led to increased drug usage and deaths by overdose, below is a visualization of the relationship between these factors: The *relative increase in the percent of the total state population that died due to drug overdose in the 12 months ending in April 2020 vs April 2021*, compared to the *increase in the percent of the state population experiencing unemployment from February 2020, before the pandemic, to October 2020,* when unemployment began to recede in most states.
@@ -372,7 +378,7 @@ u4 <- ggplot(covid_od_unemp, aes(x = unemp_change, y = odpop_perc, label = state
 u3 <- ggplot(covid_od_unemp, aes(x = unemp_change, y = odincrease_apr20apr21, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Unemployment growth vs 12 month OD increase", x = "Relative increase in unemployment, February 2020 - October 2020", y = "% increase in deaths by OD from 04/19-04/20 to 04/20-04/21")
+  labs(title = "Unemployment rise vs 12 month OD increase", x = "Relative increase in unemployment, February 2020 - October 2020", y = "% increase in deaths by OD from 04/19-04/20 to 04/20-04/21")
 ```
 
 ```{r plot_umpod3}
@@ -380,6 +386,8 @@ ggplotly(u3, tooltip = c("label"))
 ```
 
 This plot shows normalized unemployment values vs the percentage increase in drug overdoses per capita for the 12 month period coinciding with COVID-19, compared to the 12 month period immediately prior. A positive correlation is suggested, but is not definitive.
+
+<br>
 
 ## COVID-19 and economic shutdown in the US
 
@@ -453,28 +461,10 @@ w1 <- ggplot(covid_od_econ, aes(x = econdrop, y = odincrease_apr20apr21, label =
 ggplotly(w1, tooltip = c("label"))
 ```
 
+<br>
+
 ## Conclusion and Summary
 
+This project has been an attempt to sift through the available datasets and detect incontrovertible relationships between the indicators in question – COVID-19 cases and associated deaths, and deaths due to drug overdose. As these crises both affect and are affected by the common circumstances of daily life - employment, health, mental wellbeing - the question of whether they are directly influencing each other is a natural one. Ultimately, the analyses performed did suggest a correlation between these variables and were intriguing enough to warrant further investigation, but were not indisputable beyond all doubt. 
 
-## Methods
-Data regarding the population of the US and its States was collected from the census.gov’s API portal. It was converted to a data.table by the methods instructed in lecture, and associated with other data.tables using the data.table merge method.
-The COVID-19 data was accessed via the data.cdc.gov API portal. It was merged with census data to calculate COVID-19 infections and deaths as a percentage of the state population.
-Data regarding drug overdoses in the USA was also accessed through the data.cdc.gov API. It was merged with the census data to be able to calculate overdose percentages by state population. Later, it was merged with the COVID-19 data to investigate the relationship between overdoses and COVID-19 infection rates.
-Data regarding unemployment was downloaded from the Bureau of Labor Statistics website.
-Data regarding GDP was received from the Bureau of Economic Analysis API.
-The data was very reliable, as it was thoroughly gathered by the CDC, and needed very little cleaning or wrangling. Data exploration was mainly done visually using ggplot2 line and scatterplots, most of which are shown in this report.
 
-## Sources
-https://www.cdc.gov/museum/timeline/covid19.html
-
-https://www.cdc.gov/drugoverdose/deaths/synthetic/index.html  
-
-https://www.hhs.gov/opioids/about-the-epidemic/index.html
-
-https://www.cdc.gov/museum/timeline/covid19.html
-
-https://data.cdc.gov/NCHS/VSRR-Provisional-Drug-Overdose-Death-Counts/xkb8-kh2a
-
-https://apps.bea.gov/api/_pdf/bea_web_service_api_user_guide.pdf
-
-https://www.bls.gov/lau/data.htm
