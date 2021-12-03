@@ -3,7 +3,7 @@ output_dir: "."
 navbar:
   title: "PM566 Final Project Website"
   left:
-    - text: "Please enjoy!"
+    - text: "Main Page"
       href: index.html
 output:
   html_document:

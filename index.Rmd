@@ -3,9 +3,9 @@ title: "PM 566 Final Project"
 author: "Chris Hanson"
 date: "12/03/2021"
 output:
-  html_document: default
-  github_document:
-    html_preview: False
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
 always_allow_html: TRUE
 ---
 
