@@ -8,7 +8,7 @@ navbar:
     - text: "Supplementary Figures"
       href: supplementary.html
     - text: "Download the Report"
-      href: pm566project.pdf
+      href: HansonChris_PM566_FinalReport.pdf
 output:
   html_document:
     theme: yeti

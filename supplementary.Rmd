@@ -30,7 +30,8 @@ gct <- ggplot(covid_usa, aes(x = date, y = new_case)) +
   annotate(geom = "text", x = covid_usa$date[337], y = 60000, label = "Vaccination begins", angle = 90, color = "blue") +
   geom_vline(xintercept=as.numeric(covid_usa$date[527]), linetype="dashed", size = 1) +
   annotate(geom = "text", x = covid_usa$date[535], y = 150000, label = "Delta variant spreads", angle = 90, color = "blue") +
-  xlab("Date") + ylab("New COVID-19 cases")
+  xlab("Date") + ylab("New COVID-19 cases") +
+  scale_x_date(date_breaks = "2 months",  date_labels = "%m/%Y")
 
 gct
 ```
@@ -64,8 +65,8 @@ plot_geo() %>%
     z = ~covid_od$death_perc, text = covid_od$state_name, span = I(0),
     locations = covid_od$state, locationmode = 'USA-states'
   ) %>%
-  layout(geo = g) %>%
-  colorbar(title = "COVID-19 \nassociated deaths \n(% of pop)\nthrough April 2021")
+  layout(geo = g, title = '\nUS COVID-19 Associated Deaths \n(Through April 2021)') %>%
+  colorbar(title = "% of State\nPopulation")
 ```
 
 ```{r map_ods}
@@ -75,8 +76,8 @@ plot_geo() %>%
     z = ~covid_od$odincrease_apr20apr21, text = covid_od$state_name, span = I(0),
     locations = covid_od$state, locationmode = 'USA-states'
   ) %>%
-  layout(geo = g) %>%
-  colorbar(title = "% increase in\nOD associated \ndeaths,\n2019 to 2020")
+  layout(geo = g, title = '\nUS % Increase in OD Associated Deaths per Year \n(04/2020 to 04/2021)') %>%
+  colorbar(title = "% Increase\nover 1 year")
 ```
 
 The unemployment resulting from the business shutdowns during COVID-19 was experienced very differently between the states:

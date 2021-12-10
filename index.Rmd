@@ -137,12 +137,14 @@ ccpp <- ggplot(covid, aes(x = date, y = case_perc, color = state_name)) +
   geom_line() +
   labs(title = "COVID-19 cases by % of state population", subtitle = "Source: data.cdc.gov API") +
   xlab("Date") + ylab("COVID-19 cases by % of state population") +
-  theme(legend.title = element_text(size = 5), legend.text = element_text(size = 5))
+  theme(legend.title = element_text(size = 5), legend.text = element_text(size = 5)) +
+  scale_x_date(date_breaks = "3 months",  date_labels = "%m/%Y")
 
 cdpp <- ggplot(covid, aes(x = date, y = death_perc, color = state_name)) +
   geom_line() +
-  labs(title = "COVID-19 deaths by % of state population", subtitle = "Source: data.cdc.gov API")+
-  xlab("Date") + ylab("COVID-19 deaths by % of state population")
+  labs(title = "COVID-19 Deaths by % of State Population", subtitle = "Source: data.cdc.gov API")+
+  xlab("Date") + ylab("COVID-19 Deaths by % of State Population") +
+  scale_x_date(date_breaks = "3 months",  date_labels = "%m/%Y")
 ```
 
 ```{r covid_max}
@@ -194,13 +196,15 @@ drugs <- drugs[state != "DC"]
 drugs <- drugs[order(state_number, date)]
 ```
 
+### This website is a summary of the findings of this investigation. To see the full report, please click "Download the Report" above.
+
 Drug overdose deaths in the United States have been rising steadily since the turn of the century, and a significant increase in this trend has been observed since the mid-2010's. In March 2020, the COVID-19 pandemic led to an upheaval in nearly every aspect of daily life, resulting in drastic changes to the way we work, socialize, and interact with society at large. To slow the spread of the virus, most public places of congregation were shut down, leading to widespread loss of jobs and a crash of the economy.
 
 Substance abuse is associated with unemployment or underemployment, lack of career opportunities, social isolation, mental health issues, and homelessness. As COVID-19 has contributed to each of these factors, an investigation into the pandemic’s effect on the substance abuse crisis is warranted.
 
 <br>
 
-## COVID-19 in the US
+## The COVID-19 pandemic in the US
 
 The COVID-19 pandemic was experienced differently in each state:
 
@@ -208,7 +212,7 @@ The COVID-19 pandemic was experienced differently in each state:
 ggplotly(cdpp)
 ```
 
-The state with the highest number deaths per population, `r covid_max[1,state_name]` (`r format(round(covid_max[1,death_perc]), 2)`%), has experienced per population mortality rates `r format(round(covid_max[1,death_perc] / covid_max[nrow(covid_max),death_perc]), 0)`% higher than that of the lowest number of deaths per population, `r covid_max[nrow(covid_max),state_name]` (`r format(round(covid_max[nrow(covid_max),death_perc]), 0)`%).
+The state with the highest number deaths per population, `r covid_max[1,state_name]` (`r format(round(covid_max[1,death_perc], 2))`%), has experienced per population mortality rates `r format(round(covid_max[1,death_perc] / covid_max[nrow(covid_max),death_perc], 2))`x higher than that of the lowest number of deaths per population, `r covid_max[nrow(covid_max),state_name]` (`r format(round(covid_max[nrow(covid_max),death_perc], 2))`%).
 
 <br>
 
@@ -228,8 +232,8 @@ drugs_usa$region <- NULL
 gdu <- ggplot(drugs_usa, aes(x = date, y = deaths, color = indicator)) +
   geom_line(size = 1.5) +
   geom_vline(xintercept=as.Date("2020-02-01"), linetype="dashed", size = 1) +
-  annotate(x = as.Date("2019-11-01"), y = 70000, label = "Start of COVID-19", geom="text", angle = 90, size = 6) +
-  theme(legend.title = element_text(size = 8), legend.text = element_text(size = 6)) +
+  annotate(x = as.Date("2019-12-01"), y = 70000, label = "Start of COVID-19", geom="text", angle = 90, size = 5) +
+  theme(legend.title = element_text(size = 8), legend.text = element_text(size = 7)) +
   labs(x = "Date", y = "12 month rolling sum of deaths from OD", title = "Total US deaths by OD from significant drug categories, 2015-2021") +
   scale_x_date(date_breaks = "year",  date_labels = "%Y") +
   theme(legend.title = element_text(size = 8), legend.text = element_text(size = 7)) 
@@ -280,7 +284,8 @@ od_deaths <- od_deaths[order(state_name, date)]
 # Plotting od deaths scaled by population
 allodpop <- ggplot(od_deaths, aes(x = date, y = odpop_perc, color = state_name)) +
   geom_line() + #show.legend = FALSE
-  labs(title = "12 month rolling sum of OD deaths, by % of state pop", x = "Date", y = "12 month rolling sum of OD deaths, by % of state pop.", subtitle = "Source: data.cdc.gov API")
+  labs(title = "12 month rolling sum of OD deaths, by % of state pop", x = "Date", y = "12 month rolling sum of OD deaths, by % of state pop.", subtitle = "Source: data.cdc.gov API") +
+  scale_x_date(date_breaks = "1 year",  date_labels = "%Y")
 ```
 
 ```{r plot_odstates}
@@ -305,12 +310,16 @@ covid_od <- merge.data.frame(covid_0421, od_max)
 od_cov1 <- ggplot(covid_od, aes(x = death_perc, y = odincrease_apr20apr21, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Deaths by COVID vs deaths by overdose in US states", x = "COVID-19 deaths, by % of state pop", y = "% increase in deaths by OD, 04/20-04/21", subtitle = "Source: data.cdc.gov API")
+  labs(title = "Deaths by COVID vs deaths by overdose in US states", x = "COVID-19 deaths, by % of state pop", y = "% increase in deaths by OD, 04/20-04/21", subtitle = "Source: data.cdc.gov API") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
 
 od_cov2 <- ggplot(covid_od, aes(x = case_perc, y = odpop_perc, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Cases of COVID vs deaths by overdose in US states", x = "% of state pop infected by COVID-19", y = "% of total state population killed by OD, April 2020 - April 2021", subtitle = "Source: data.cdc.gov API")
+  labs(title = "Cases of COVID vs deaths by overdose in US states", x = "% of state pop infected by COVID-19", y = "% of total state population killed by OD, April 2020 - April 2021", subtitle = "Source: data.cdc.gov API") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
 ```
 
 The plot below probes the question of whether statewide COVID-19 *deaths* per capita is correlated with the *percentage increase (over subsequent 12 month periods) in deaths due to overdose* per capita.
@@ -348,7 +357,8 @@ unemployment <- unemployment[order(STATE, date)]
 unemployment_plot <- unemployment %>% filter(date >= "2018-01-01")
 unem <- ggplot(unemployment_plot, aes(x = date, y = value, color = STATE)) +
   geom_line() +
-  labs(title = "Unemployment %, per state", x = "Date", y = "Unemployment rate (seasonally adjusted)", subtitle = "Source: US Bureau of Labor Statistics")
+  labs(title = "Unemployment %, per state", x = "Date", y = "Unemployment rate (seasonally adjusted)", subtitle = "Source: US Bureau of Labor Statistics") +
+  scale_x_date(breaks = seq(as.Date("2018-01-01"), as.Date("2021-10-01"), by="6 months"), date_labels = "%m/%Y")
 ```
 
 ```{r unemployment_cleanup}
@@ -366,17 +376,23 @@ covid_od_unemp <- covid_od_unemp %>% filter(!state_name %in% c("HAWAII"))
 u5 <- ggplot(covid_od_unemp, aes(x = umax_value, y = odpop_perc, label = state_name, color = death_perc)) +
   geom_point() +
   geom_smooth() +
-  labs(title = "Unemployment vs deaths by OD", x = "Unemployment %, October 2020", y = "OD deaths by % of state population, April 2020 - April 2021", color = "Deaths from\nCOVID-19 by\n% state \npopulation")
+  labs(title = "Unemployment vs deaths by OD", x = "Unemployment %, October 2020", y = "OD deaths by % of state population, April 2020 - April 2021", color = "Deaths from\nCOVID-19 by\n% state \npopulation") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
 
 u4 <- ggplot(covid_od_unemp, aes(x = unemp_change, y = odpop_perc, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Increase in unemployment vs deaths by OD", x = "Relative increase in unemployment, April 2020 - October 2020", y = "OD deaths by % of state population, February 2020 - April 2021")
+  labs(title = "Increase in unemployment vs deaths by OD", x = "Relative increase in unemployment, April 2020 - October 2020", y = "OD deaths by % of state population, February 2020 - April 2021") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
 
 u3 <- ggplot(covid_od_unemp, aes(x = unemp_change, y = odincrease_apr20apr21, label = state_name)) +
   geom_point(aes(color = region)) +
   geom_smooth() +
-  labs(title = "Unemployment rise vs 12 month OD increase", x = "Relative increase in unemployment, February 2020 - October 2020", y = "% increase in deaths by OD from 04/19-04/20 to 04/20-04/21")
+  labs(title = "Unemployment rise vs 12 month OD increase", x = "Relative increase in unemployment %, February 2020 - October 2020", y = "% increase in deaths by OD from 04/19-04/20 to 04/20-04/21") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
 ```
 
 ```{r plot_umpod3}
@@ -433,11 +449,13 @@ econ_relative <- econ_relative[order(GeoName, TimePeriod.x)]
 ```{r econ_plot}
 ggecon <- ggplot(econ, aes(x = TimePeriod, y = DataValue, color = GeoName)) +
   geom_point() +
-  labs(title = "Quarterly state GDP", x = "Date", y = "State GDP (millions of chained 2012 dollars)", subtitle = "Source: US Bureau of Economic Analysis API")
+  labs(title = "Quarterly state GDP", x = "Date", y = "State GDP (millions of chained 2012 dollars)", subtitle = "Source: US Bureau of Economic Analysis API")  +
+  scale_x_date(breaks = seq(as.Date("2018-01-01"), as.Date("2021-06-01"), by="6 months"), date_labels = "%m/%Y")
 
 ggecon_rel <- ggplot(econ_relative, aes(x = TimePeriod.x, y = relative, color = GeoName)) +
   geom_point() +
-  labs(title = "Quarterly state GDP, relative to 4th quarter 2019", x = "Date", y = "State GDP (relative to 4th qtr 2019)", subtitle = "Source: US Bureau of Economic Analysis API")
+  labs(title = "Quarterly state GDP, relative to 4th quarter 2019", x = "Date", y = "State GDP (relative to 4th qtr 2019)", subtitle = "Source: US Bureau of Economic Analysis API")  +
+  scale_x_date(breaks = seq(as.Date("2018-01-01"), as.Date("2021-06-01"), by="6 months"), date_labels = "%m/%Y")
 ```
 
 ```{r econ_plot2}
@@ -454,7 +472,9 @@ covid_od_econ <- covid_od_econ %>% filter(!state_name %in% c("HAWAII", "ALASKA")
 w1 <- ggplot(covid_od_econ, aes(x = econdrop, y = odincrease_apr20apr21, label = state_name, color = case_perc)) +
   geom_point() +
   geom_smooth() +
-  labs(title = "Economic recession vs 12 month OD increase", x = "% drop in state GDP, QTR4 2019 - QTR2 2020", y = "% increase in deaths by OD, 04/19-04/20 vs 04/20-04/21", color = "Cases of\nCOVID-19 by\n% state population")
+  labs(title = "Economic recession vs 12 month OD increase", x = "% drop in state GDP, QTR4 2019 - QTR2 2020", y = "% increase in deaths by OD, 04/19-04/20 vs 04/20-04/21", color = "Cases of\nCOVID-19 by\n% state population") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
 
 ggplotly(w1, tooltip = c("label"))
 ```
@@ -464,5 +484,3 @@ ggplotly(w1, tooltip = c("label"))
 ## Conclusion and Summary
 
 This project has been an attempt to sift through the available datasets and detect incontrovertible relationships between the indicators in question – COVID-19 cases and associated deaths, and deaths due to drug overdose. As these crises both affect and are affected by the common circumstances of daily life - employment, health, mental wellbeing - the question of whether they are directly influencing each other is a natural one. Ultimately, the analyses performed did suggest a correlation between these variables and were intriguing enough to warrant further investigation, but were not indisputable beyond all doubt. 
-
-
