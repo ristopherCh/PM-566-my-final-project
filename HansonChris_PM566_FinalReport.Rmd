@@ -8,6 +8,9 @@ output:
     latex_engine: xelatex
     toc: true
     toc_depth: 1
+  github_document:
+    html_preview: no
+  html_document: default
 always_allow_html: yes
 mainfont: Times New Roman
 sansfont: Calibri Light

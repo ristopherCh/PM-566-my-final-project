@@ -196,7 +196,11 @@ drugs <- drugs[state != "DC"]
 drugs <- drugs[order(state_number, date)]
 ```
 
+<br>
+
 ### This website is a summary of the findings of this investigation. To see the full report, please click "Download the Report" above.
+
+<br>
 
 Drug overdose deaths in the United States have been rising steadily since the turn of the century, and a significant increase in this trend has been observed since the mid-2010's. In March 2020, the COVID-19 pandemic led to an upheaval in nearly every aspect of daily life, resulting in drastic changes to the way we work, socialize, and interact with society at large. To slow the spread of the virus, most public places of congregation were shut down, leading to widespread loss of jobs and a crash of the economy.
 
@@ -216,7 +220,7 @@ The state with the highest number deaths per population, `r covid_max[1,state_na
 
 <br>
 
-## The drug mortality crisis in the US
+## The drug overdose crisis in the US
 
 Shown below is overdoses in the US from 2015-2021, broken down by drug type and sub-type.
 
@@ -403,7 +407,7 @@ This plot shows normalized unemployment values vs the percentage increase in dru
 
 <br>
 
-## COVID-19 and economic shutdown in the US
+## COVID-19 and economic recession in the US
 
 Another way to measure the economic health of a community is to consider the change in state GDP in the period following the COVID lockdown.
 

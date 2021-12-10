@@ -42,7 +42,7 @@ Comparing the plot below to that of COVID-19 deaths on the home page, we see tha
 ggplotly(ccpp)
 ```
 
-This plot compares COVID-19 cases per state with raw, non-normalized deaths due to overdose. Outliers such as West Virginia fall into place when normalizing OD values to their pre-COVID levels.
+This plot compares COVID-19 cases per state with raw, non-normalized deaths due to overdose. Outliers such as West Virginia fall into place when normalizing OD values with their pre-COVID levels.
 
 ```{r plot_covidvsod2}
 ggplotly(od_cov2)
