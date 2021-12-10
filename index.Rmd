@@ -82,7 +82,6 @@ divisions <- fread('data/us_divisions.csv')
 divisions$State = toupper(divisions$State)
 
 # merge with census
-
 census <- merge(census, divisions, by.x = "state_name", by.y = "State", all.x = TRUE)
 census$'State Code' <- NULL
 census$Division <- NULL
@@ -209,7 +208,7 @@ The COVID-19 pandemic was experienced differently in each state:
 ggplotly(cdpp)
 ```
 
-The state with the highest number deaths per population, `r covid_max[1,state_name]`, has experienced per population mortality rates `r format(round(covid_max[1,death_perc] * 100 / covid_max[nrow(covid_max),death_perc]), 2)`% higher than that of the lowest number of deaths per population, `r covid_max[nrow(covid_max),state_name]`.
+The state with the highest number deaths per population, `r covid_max[1,state_name]` (`r format(round(covid_max[1,death_perc]), 2)`%), has experienced per population mortality rates `r format(round(covid_max[1,death_perc] / covid_max[nrow(covid_max),death_perc]), 0)`% higher than that of the lowest number of deaths per population, `r covid_max[nrow(covid_max),state_name]` (`r format(round(covid_max[nrow(covid_max),death_perc]), 0)`%).
 
 <br>
 
@@ -282,7 +281,6 @@ od_deaths <- od_deaths[order(state_name, date)]
 allodpop <- ggplot(od_deaths, aes(x = date, y = odpop_perc, color = state_name)) +
   geom_line() + #show.legend = FALSE
   labs(title = "12 month rolling sum of OD deaths, by % of state pop", x = "Date", y = "12 month rolling sum of OD deaths, by % of state pop.", subtitle = "Source: data.cdc.gov API")
-
 ```
 
 ```{r plot_odstates}
@@ -354,8 +352,8 @@ unem <- ggplot(unemployment_plot, aes(x = date, y = value, color = STATE)) +
 ```
 
 ```{r unemployment_cleanup}
-umax <- unemployment %>% filter(date == "2020-10-01") #vary this, 10 is good
-umin <- unemployment %>% filter(date == "2020-02-01") #invariable, 02 or 03
+umax <- unemployment %>% filter(date == "2020-10-01")
+umin <- unemployment %>% filter(date == "2020-02-01")
 unemployment_change <- select(umin, c("STATE"))
 unemployment_change$unemp_change <- umax$value - umin$value
 unemployment_change$umax_value <- umax$value
@@ -401,7 +399,7 @@ Below is a visualization of the relationship between the normalized percentage d
 
 if(!exists("econquery")){
 econquery <- GET(url = "https://apps.bea.gov/api/data/?&UserID=0BACEFA6-DE0F-459B-B599-D4B53A5B7528&method=GetData&datasetname=Regional&TableName=SQGDP9&LineCode=1&GeoFips=STATE&Frequency=Q&Year=2018,2019,2020,2021&ResultFormat=JSON"
-                 )} #Real GDP by state
+)} #Real GDP by state
 
 # Checking if the website is active
 #econquery$status_code
@@ -427,7 +425,7 @@ econ_min <- econ[TimePeriod == "2019-10-01"]
 setnames(econ_min, "DataValue", "relative_value")
 
 econ_relative <- merge(econ, econ_min, by = "GeoName")
-econ_relative$relative <- econ_relative$DataValue / econ_relative$`relative_value`
+econ_relative$relative <- econ_relative$DataValue / econ_relative$relative_value
 #econ_relative <- filter(econ_relative, TimePeriod.x >= "2019-07-01")
 econ_relative <- econ_relative[order(GeoName, TimePeriod.x)]
 ```
